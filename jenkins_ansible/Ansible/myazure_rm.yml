@@ -1,0 +1,8 @@
+plugin: azure_rm 
+include_vm_resource_groups: 
+- jenkins-group-westus2
+auth_source: auto 
+
+conditional_groups: 
+  #Placing every VM with Location = WestUS2 in the domain_controllers Ansible host group 
+  domain_controllers: "tags.Environment == 'Jenkins'"
