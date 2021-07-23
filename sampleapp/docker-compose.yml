@@ -1,0 +1,14 @@
+version: '3'
+services:
+  httpd:
+    container_name: httpdtest
+    image: basicapache:v1.1.0
+    tty: true
+    build: 
+      context: .
+    ports:
+      - "8082:80"
+    networks:
+      - net
+networks:
+  net:
