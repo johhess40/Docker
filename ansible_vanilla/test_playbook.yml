@@ -1,0 +1,12 @@
+--- 
+- name: Send file to domain controllers 
+  hosts: domain_controllers
+  gather_facts: no 
+
+  vars_files:
+  - "./group_vars/dcvars.yml"
+  tasks:
+  - name: Create the test file 
+    win_file: 
+      path: C:\hello.txt
+      state: touch 

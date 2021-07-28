@@ -1,0 +1,61 @@
+--- 
+- name: Using azure collection
+  hosts: localhost
+     
+  vars_prompt:
+    - name: adminuser
+      prompt: "Enter a user name for the admin user"
+    - name: adminpass
+      promt: "Enter a password for the admin account"
+  collections:
+    - azure.azcollection
+  tasks:
+      - name: Create Resource group 
+        azure_rm_resourcegroup:
+          name: testrg-westus2-jh
+          location: westus2
+      - name: Create a virtual network
+        azure_rm_virtualnetwork:
+          name: vnet01 
+          resource_group: testrg-westus2-jh
+          address_prefixes_cidr: 10.1.0.0/16
+          state: present
+
+      - name: create Azure subnet in virtualnetwork
+        azure_rm_subnet:
+          name: subnet01
+          state: present
+          virtual_network_name: vnet01
+          resource_group: testrg-westus2-jh
+          address_prefix_cidr: 10.1.0.0/24   
+          
+      - name: Create VM with defaults
+        azure_rm_virtualmachine:
+          admin_username: "{{ adminuser }}"
+          admin_password: "{{ adminpass }}"
+          os_type: Windows
+          location: westus2
+          managed_disk_type: Standard_LRS
+          data_disks: 
+            - lun: 0
+              disk_size_gb: 40
+              managed_disk_type: Standard_LRS
+          image:
+            offer: WindowsServer
+            publisher: MicrosoftWindowsServer
+            sku: 2016-Datacenter
+            version: latest
+          name: "{{ item }}"
+          resource_group: testrg-westus2-jh
+          state: present
+          vm_size: "Standard_B2ms"
+          virtual_network_name: vnet01
+          subnet_name: subnet01
+          tags: {
+              "Location" : "WestUS2",
+              "Environment" : "Dev/Test"
+            } 
+        loop: 
+          - vm-westus2 
+          - vm01-westus2 
+          - vm02-westus2
